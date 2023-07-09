@@ -1,0 +1,30 @@
+{
+  "game_1": {
+    "total_kills": 4,
+    "players": [
+      "Dono da Bola",
+      "Oootsimo",
+      "Isgalamido",
+      "Assasinu Credi",
+      "Zeh",
+      "Mal"
+    ],
+    "kills": [
+      {
+        "ranking": 1,
+        "player": "Assasinu Credi",
+        "numberOfTimes": 2
+      },
+      {
+        "ranking": 2,
+        "player": "Isgalamido",
+        "numberOfTimes": 1
+      },
+      {
+        "ranking": 3,
+        "player": "Mal",
+        "numberOfTimes": -1
+      }
+    ]
+  }
+}

@@ -1,0 +1,11 @@
+{
+  "game_1": {
+    "total_kills": 3,
+    "deaths": [
+      {
+        "cause": "MOD_TRIGGER_HURT",
+        "count": 3
+      }
+    ]
+  }
+}
