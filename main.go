@@ -1,1 +1,7 @@
-package log_parser
+package main
+
+import "log-parser/cmd"
+
+func main() {
+	cmd.Run()
+}
