@@ -5,6 +5,7 @@ import (
 	"io"
 	"log"
 	"log-parser/config"
+	deathsReport "log-parser/processor/quake/deaths-report"
 	matchReport "log-parser/processor/quake/match-report"
 	"os"
 	"testing"
@@ -38,6 +39,12 @@ func TestNewProcessor(t *testing.T) {
 							SkipWriter:  true,
 							ProcessLnFn: matchReport.Process,
 							Response:    matchReport.GetReport,
+						},
+						{
+							ReportName:  "deaths-report",
+							SkipWriter:  true,
+							ProcessLnFn: deathsReport.Process,
+							Response:    deathsReport.GetReport,
 						},
 					}
 				}(),

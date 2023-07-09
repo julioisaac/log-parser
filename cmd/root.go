@@ -4,6 +4,7 @@ import (
 	"log"
 	"log-parser/config"
 	"log-parser/processor"
+	"log-parser/processor/quake/deaths-report"
 	"log-parser/processor/quake/match-report"
 	"os"
 )
@@ -22,6 +23,11 @@ func Run() {
 			ReportName:  "match-report",
 			ProcessLnFn: matchReport.Process,
 			Response:    matchReport.GetReport,
+		},
+		{
+			ReportName:  "death-report",
+			ProcessLnFn: deathsReport.Process,
+			Response:    deathsReport.GetReport,
 		},
 	}
 
