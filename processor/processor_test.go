@@ -12,7 +12,6 @@ import (
 )
 
 func TestNewProcessor(t *testing.T) {
-	done := make(chan struct{})
 	type args struct {
 		name string
 		file *os.File
@@ -78,12 +77,9 @@ func TestNewProcessor(t *testing.T) {
 			p.Start()
 
 			go func() {
-				defer func() {
-					done <- struct{}{}
-				}()
-
-				for i, cfg := range tt.args.pCfg {
-					gotJson, err := json.MarshalIndent(cfg.Response(), "", "  ")
+				for i, ch := range p.ch {
+					<-ch
+					gotJson, err := json.MarshalIndent(tt.args.pCfg[i].Response(), "", "  ")
 					if (err != nil) != tt.wantErr {
 						t.Errorf("Process() error = %v, wantErr %v", err, tt.wantErr)
 						return
@@ -94,7 +90,6 @@ func TestNewProcessor(t *testing.T) {
 				}
 			}()
 
-			<-done
 		})
 	}
 }
