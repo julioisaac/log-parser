@@ -55,7 +55,7 @@ $ make checks
 
 ## Implementation
 
-### processor.ProcessCfg
+```processor.ProcessCfg```
 ```go
 type ProcessCfg struct {
 	SkipWriter  bool
@@ -66,14 +66,14 @@ type ProcessCfg struct {
 ```
 The structure was created to make the pass of required parameters easier.
 
-### ProcessLnFn
+```ProcessLnFn```
 ```go 
 func(ctx context.Context, line string)
 ```
 This is the signature that must be followed by the process function in order to receive the lines to be processed.
 
 
-### processor.NewFileProcessor
+```processor.NewFileProcessor```
 ```go 
 func NewFileProcessor(name string, file *os.File, pCfg []ProcessCfg) *FileProcessor
 ```
