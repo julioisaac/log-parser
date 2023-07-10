@@ -1,33 +1,40 @@
-SRC=$(shell find . -name "*.go")
-IMAGE_NAME=log-parser
-ifneq (,$(wildcard ./.env))
-    include .env
-    export
-endif
+SHELL=/bin/bash
+GOPACKAGES=$(shell go list ./... | egrep -v "vendor|mock")
+
+install: check-dependencies vendor tools
 
 check-dependencies:
 	go mod tidy
 	git diff --exit-code go.mod
+	git diff --exit-code go.sum
 
-deps: check-dependencies
-	go mod tidy
-	go mod download
-	go install -v github.com/go-critic/go-critic/cmd/gocritic@latest
+vendor:
+	go mod vendor
+
+tools:
+	go install github.com/golangci/golangci-lint/cmd/golangci-lint@latest
+
+checks: test check-dependencies lint
 
 test:
 	go test -v -cover `go list ./...`
 
+lint:
+	golangci-lint run -v
+
+deps: check-dependencies
+	go mod tidy
+	go mod download
+
 run:
 	go run main.go
 
-build:
+docker/build:
 	docker build -t log-parser .
 
-start:
-	docker run --name log-parser --env-file .env log-parser
+docker/start: docker/stop
+	docker run --name log-parser log-parser
 
-stop:
+docker/stop:
 	docker stop log-parser
-
-lint:
-	gocritic check ./...
+	docker rm log-parser
