@@ -1,4 +1,4 @@
-package matchReport
+package matchesReport
 
 import (
 	"testing"

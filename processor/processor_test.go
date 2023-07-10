@@ -5,8 +5,8 @@ import (
 	"io"
 	"log"
 	"log-parser/config"
-	deathsReport "log-parser/processor/quake/deaths-report"
-	matchReport "log-parser/processor/quake/match-report"
+	"log-parser/processor/quake/deaths-report"
+	"log-parser/processor/quake/matches-report"
 	"os"
 	"testing"
 )
@@ -35,9 +35,12 @@ func TestNewProcessor(t *testing.T) {
 					return givenLogTest1
 				}(),
 				pCfg: func() []ProcessCfg {
+					matchReport := matchesReport.NewMatchReportHandler()
+					deathReportHandler := deathsReport.NewDeathReportHandler()
+
 					return []ProcessCfg{
 						{
-							ReportName:  "match-report",
+							ReportName:  "matches-report",
 							SkipWriter:  true,
 							ProcessLnFn: matchReport.Process,
 							Response:    matchReport.GetReport,
@@ -45,8 +48,8 @@ func TestNewProcessor(t *testing.T) {
 						{
 							ReportName:  "deaths-report",
 							SkipWriter:  true,
-							ProcessLnFn: deathsReport.Process,
-							Response:    deathsReport.GetReport,
+							ProcessLnFn: deathReportHandler.Process,
+							Response:    deathReportHandler.GetReport,
 						},
 					}
 				}(),
