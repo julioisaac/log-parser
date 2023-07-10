@@ -19,7 +19,7 @@ var execute = map[commons2.TypeOfProcess]func(string){
 	commons2.Kill:         killProcess,
 }
 
-func Process(ctx context.Context, line string) {
+func Process(_ context.Context, line string) {
 	typeOfProcess := commons2.GetTypeOfProcess(line)
 	if commons2.Ignore == typeOfProcess {
 		return

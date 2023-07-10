@@ -22,7 +22,7 @@ func GetReport() interface{} {
 	return deathCauseReport
 }
 
-func Process(ctx context.Context, line string) {
+func Process(_ context.Context, line string) {
 	typeOfProcess := commons2.GetTypeOfProcess(line)
 	if commons2.Ignore == typeOfProcess {
 		return
