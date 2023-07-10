@@ -7,7 +7,7 @@ on:
 jobs:
   lint:
     name: "Lint"
-    runs-on: [self-hosted, production-medium]
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
@@ -27,7 +27,7 @@ jobs:
   tests:
     needs: [lint]
     name: "Unit Tests"
-    runs-on: [self-hosted, production-medium]
+    runs-on: ubuntu-20.04
     steps:
       - uses: actions/checkout@v3
         with:
