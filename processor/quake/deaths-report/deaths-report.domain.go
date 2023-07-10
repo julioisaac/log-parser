@@ -38,3 +38,11 @@ func (km DeathMap) Sort() []Death {
 
 	return sorted
 }
+
+func (km DeathMap) Sum() int {
+	sum := 0
+	for _, value := range km {
+		sum += value
+	}
+	return sum
+}
