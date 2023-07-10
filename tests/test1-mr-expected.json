@@ -1,0 +1,20 @@
+{
+  "game_1": {
+    "total_kills": 3,
+    "players": [
+      "Zeh",
+      "Assasinu Credi",
+      "Dono da Bola",
+      "Fasano Again",
+      "Isgalamido",
+      "Oootsimo"
+    ],
+    "kills": [
+      {
+        "ranking": 1,
+        "Player": "Zeh",
+        "numberOfTimes": -3
+      }
+    ]
+  }
+}
