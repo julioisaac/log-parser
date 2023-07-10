@@ -61,7 +61,7 @@ type ProcessCfg struct {
 	SkipWriter  bool
 	ReportName  string
 	ProcessLnFn func(ctx context.Context, line string)
-    Response    func() interface{}
+	Response    func() interface{}
 }
 ```
 The structure was created to make the pass of required parameters easier.
