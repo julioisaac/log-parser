@@ -19,7 +19,7 @@ var dispatchTable = map[commons.TypeOfProcess]func(*MatchReportHandler, string){
 	commons.InitGame:     (*MatchReportHandler).initGameFn,
 	commons.ShutdownGame: (*MatchReportHandler).shutdownGameFn,
 	commons.Player:       (*MatchReportHandler).playerProcess,
-	commons.Kill:         (*MatchReportHandler).deathProcess,
+	commons.Kill:         (*MatchReportHandler).killProcess,
 }
 
 func NewMatchReportHandler() *MatchReportHandler {
@@ -68,7 +68,7 @@ func (p *MatchReportHandler) playerProcess(line string) {
 	}
 }
 
-func (p *MatchReportHandler) deathProcess(line string) {
+func (p *MatchReportHandler) killProcess(line string) {
 	p.KillCounter++
 	matches := commons.KillRegex.FindStringSubmatch(line)
 	killerName := matches[commons.KillerName]
