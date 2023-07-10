@@ -48,6 +48,9 @@ $ make checks
 |------------------|------------------------------------------------------------|
 | `deps`           | downloads all the dependencies needed to build the project |
 | `test`           | runs all the unit tests                                    |
+| `clean-coverage` | clean coverage cover.out file                              |
+| `coverage`       | runs test coverage and generate cover.out file             |
+| `coverage-html`  | runs coverage tools on browser                             |
 | `docker/build`   | build the docker image                                     |
 | `docker/start`   | runs the project by docker                                 | 
 | `docker/stop`    | stop docker container                                      |
