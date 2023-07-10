@@ -6,6 +6,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log-parser/logger"
 	"os"
 	"sync"
 )
@@ -15,40 +16,43 @@ type ctxLine struct {
 	line string
 }
 
-type ProcessLnFn func(ctx context.Context, value string)
-type Response func() interface{}
-
 type ProcessCfg struct {
 	SkipWriter  bool
 	ReportName  string
-	ProcessLnFn ProcessLnFn
-	Response    Response
+	ProcessLnFn func(ctx context.Context, line string)
+	Response    func() interface{}
 }
 
-type Processor struct {
+type FileProcessor struct {
+	name   string
 	reader *bufio.Reader
 	pc     []ProcessCfg
+	n      int
 	ch     []chan ctxLine
 	wg     *sync.WaitGroup
 }
 
-func NewProcessor(file *os.File, pCfg []ProcessCfg) *Processor {
+func NewFileProcessor(name string, file *os.File, pCfg []ProcessCfg) *FileProcessor {
 	numChannels := len(pCfg)
 	channels := make([]chan ctxLine, numChannels)
 	for i := 0; i < numChannels; i++ {
 		channels[i] = make(chan ctxLine)
 	}
-	return &Processor{
+	return &FileProcessor{
+		name:   name,
 		pc:     pCfg,
+		n:      numChannels,
 		reader: bufio.NewReader(file),
 		ch:     channels,
 		wg:     &sync.WaitGroup{},
 	}
 }
 
-func (p *Processor) Start() {
+func (p *FileProcessor) Start() {
+	logger.Log.Infof("[%s] file processor started", p.name)
 
-	for i := 0; i < len(p.ch); i++ {
+	logger.Log.Infof("[%s] initializing %d goroutines", p.name, p.n)
+	for i := 0; i < p.n; i++ {
 		p.wg.Add(1)
 		go p.processHandler(i, p.wg)
 	}
@@ -61,9 +65,11 @@ func (p *Processor) Start() {
 			break
 		}
 	}
+	logger.Log.Infof("[%s] file processor stopped", p.name)
+
 }
 
-func (p *Processor) processHandler(chIdx int, wg *sync.WaitGroup) {
+func (p *FileProcessor) processHandler(chIdx int, wg *sync.WaitGroup) {
 	defer wg.Done()
 	for ctxLn := range p.ch[chIdx] {
 		func(ctx context.Context, ln string) {
@@ -74,9 +80,11 @@ func (p *Processor) processHandler(chIdx int, wg *sync.WaitGroup) {
 	}
 }
 
-func (p *Processor) readAndProcessLn() bool {
+func (p *FileProcessor) readAndProcessLn() bool {
 	ctx := context.Background()
 	ln, err := p.reader.ReadString('\n')
+	logger.Log.Tracef("[%s] reading line: %s", p.name, ln)
+
 	if err != nil {
 		if err == io.EOF || err == context.Canceled {
 			return false
@@ -84,7 +92,7 @@ func (p *Processor) readAndProcessLn() bool {
 
 		return true
 	}
-	for i := 0; i < len(p.ch); i++ {
+	for i := 0; i < p.n; i++ {
 		p.ch[i] <- ctxLine{
 			ctx:  ctx,
 			line: ln,
@@ -94,36 +102,43 @@ func (p *Processor) readAndProcessLn() bool {
 	return true
 }
 
-func (p *Processor) Stop() {
-	for i := 0; i < len(p.ch); i++ {
+func (p *FileProcessor) Stop() {
+	for i := 0; i < p.n; i++ {
 		close(p.ch[i])
 	}
 }
 
-func (p *Processor) Writer() {
-	for i := 0; i < len(p.ch); i++ {
+func (p *FileProcessor) Writer() {
+	for i := 0; i < p.n; i++ {
 		if !p.pc[i].SkipWriter {
-			p.reportWriter(p.pc[i].Response(), p.pc[i].ReportName)
+			err := p.writeJson(p.pc[i].Response(), p.pc[i].ReportName)
+			if err != nil {
+				logger.Log.WithError(err).Error("error writing json")
+			}
 		}
 	}
 }
 
-func (p *Processor) reportWriter(data interface{}, filename string) error {
-	file, err := os.Create(filename + ".json")
+const jsonExt = "json"
+
+func (p *FileProcessor) writeJson(data interface{}, filename string) error {
+	logger.Log.Debugf("[%s] writing file '%s'", p.name, filename)
+	file, err := os.Create(fmt.Sprintf("%s.%s", filename, jsonExt))
 	if err != nil {
-		return fmt.Errorf("failed to create file: %v", err)
+		return err
 	}
 	defer file.Close()
 
 	encodedData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to encode JSON: %v", err)
+		return err
 	}
 
 	_, err = file.Write(encodedData)
 	if err != nil {
-		return fmt.Errorf("failed to write JSON to file: %v", err)
+		return err
 	}
+	logger.Log.Debugf("%s", encodedData)
 
 	return nil
 

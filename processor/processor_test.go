@@ -13,6 +13,7 @@ import (
 
 func TestNewProcessor(t *testing.T) {
 	type args struct {
+		name string
 		file *os.File
 		pCfg []ProcessCfg
 	}
@@ -25,6 +26,7 @@ func TestNewProcessor(t *testing.T) {
 		{
 			name: "Given the test1 log should return json teste1 as expected with just the Player Zeh in Kills field",
 			args: args{
+				name: "quake",
 				file: func() *os.File {
 					givenLogTest1, err := config.LoadFile("../tests/test1-given.log")
 					if err != nil {
@@ -71,7 +73,7 @@ func TestNewProcessor(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			p := NewProcessor(tt.args.file, tt.args.pCfg)
+			p := NewFileProcessor(tt.args.name, tt.args.file, tt.args.pCfg)
 			p.Start()
 
 			for i, cfg := range tt.args.pCfg {
