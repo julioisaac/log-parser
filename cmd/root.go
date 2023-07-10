@@ -6,19 +6,16 @@ import (
 	"log-parser/processor"
 	"log-parser/processor/quake/deaths-report"
 	"log-parser/processor/quake/match-report"
-	"os"
 )
 
 func Run() {
-	log.SetOutput(os.Stdout)
-	log.SetFlags(log.Ldate | log.Ltime | log.Lmicroseconds)
 
-	file, err := config.LoadFile(os.Getenv("LOG_FILE_PATH"))
+	file, err := config.LoadFile(config.GetString("LOG_FILE_PATH"))
 	if err != nil {
 		log.Fatalf("Failed to load log file: %v", err)
 	}
 
-	reports := []processor.ProcessCfg{
+	quakeReports := []processor.ProcessCfg{
 		{
 			ReportName:  "match-report",
 			ProcessLnFn: matchReport.Process,
@@ -31,7 +28,7 @@ func Run() {
 		},
 	}
 
-	p := processor.NewProcessor(file, reports)
+	p := processor.NewFileProcessor("quake", file, quakeReports)
 	p.Start()
 
 }
