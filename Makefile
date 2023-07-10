@@ -19,6 +19,15 @@ checks: test check-dependencies lint
 test:
 	go test -v -cover `go list ./...`
 
+clean-coverage:
+	rm -rf cover.out
+
+coverage: clean-coverage
+	ENVIRONMENT=test go test ./... --tags=integration -covermode="count" -coverprofile="cover.out" $(GOPACKAGES)
+
+coverage-html: coverage
+	go tool cover -html=cover.out
+
 lint:
 	golangci-lint run -v
 

@@ -1,4 +1,4 @@
-package matchReport
+package matchesReport
 
 import "sort"
 
@@ -39,4 +39,12 @@ func (km KillsMap) Sort() []MatchKill {
 	}
 
 	return sorted
+}
+
+func (km KillsMap) Sum() int {
+	sum := 0
+	for _, value := range km {
+		sum += value
+	}
+	return sum
 }

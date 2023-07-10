@@ -5,7 +5,7 @@ import (
 	"log-parser/config"
 	"log-parser/processor"
 	"log-parser/processor/quake/deaths-report"
-	"log-parser/processor/quake/match-report"
+	"log-parser/processor/quake/matches-report"
 )
 
 func Run() {
@@ -15,16 +15,19 @@ func Run() {
 		log.Fatalf("Failed to load log file: %v", err)
 	}
 
+	matchReportHandler := matchesReport.NewMatchReportHandler()
+	deathReportHandler := deathsReport.NewDeathReportHandler()
+
 	quakeReports := []processor.ProcessCfg{
 		{
-			ReportName:  "match-report",
-			ProcessLnFn: matchReport.Process,
-			Response:    matchReport.GetReport,
+			ReportName:  "matches-report",
+			ProcessLnFn: matchReportHandler.Process,
+			Response:    matchReportHandler.GetReport,
 		},
 		{
 			ReportName:  "death-report",
-			ProcessLnFn: deathsReport.Process,
-			Response:    deathsReport.GetReport,
+			ProcessLnFn: deathReportHandler.Process,
+			Response:    deathReportHandler.GetReport,
 		},
 	}
 
