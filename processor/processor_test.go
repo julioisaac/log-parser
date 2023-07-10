@@ -12,6 +12,7 @@ import (
 )
 
 func TestNewProcessor(t *testing.T) {
+	done := make(chan struct{})
 	type args struct {
 		name string
 		file *os.File
@@ -76,16 +77,24 @@ func TestNewProcessor(t *testing.T) {
 			p := NewFileProcessor(tt.args.name, tt.args.file, tt.args.pCfg)
 			p.Start()
 
-			for i, cfg := range tt.args.pCfg {
-				gotJson, err := json.MarshalIndent(cfg.Response(), "", "  ")
-				if (err != nil) != tt.wantErr {
-					t.Errorf("Process() error = %v, wantErr %v", err, tt.wantErr)
-					return
+			go func() {
+				defer func() {
+					done <- struct{}{}
+				}()
+
+				for i, cfg := range tt.args.pCfg {
+					gotJson, err := json.MarshalIndent(cfg.Response(), "", "  ")
+					if (err != nil) != tt.wantErr {
+						t.Errorf("Process() error = %v, wantErr %v", err, tt.wantErr)
+						return
+					}
+					if string(gotJson) != tt.want[i] {
+						t.Errorf("Process() got = %v, want %v", string(gotJson), tt.want[i])
+					}
 				}
-				if string(gotJson) != tt.want[i] {
-					t.Errorf("Process() got = %v, want %v", string(gotJson), tt.want[i])
-				}
-			}
+			}()
+
+			<-done
 		})
 	}
 }
